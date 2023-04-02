@@ -1,0 +1,67 @@
+﻿@page "/"
+
+@using CRUDBlazor.Models;
+@inject IJSRuntime JSRuntime;
+@inject CRUDBlazor.Services.IEmpresaService EmpresaServices;
+
+<PageTitle>Empresas</PageTitle>
+
+<h1>Empresas</h1>
+
+<a href="/create" class="btn-success">Criar</a>
+
+<table class="table table-responsive table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Site</th>
+            <th>Segmento</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if(empresas != null && empresas.Count > 0)
+        {
+            foreach(var item in empresas)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Site</td>
+                    <td>@item.Segmento</td>
+                    <td>
+                        <a href="/update/@item.Id" class="btn btn-warning">Atualizar</a>
+                        <button class="btn btn-danger" @onclick="async () => await DeleteEmpresa(item.Id)">Deletar</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+@code{
+    List<Empresa> empresas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        empresas = await EmpresaServices.FindAll();
+    }
+
+    async Task DeleteEmpresa(Guid id)
+    {
+        bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Tem certeza ?");
+        if (confirmed is false)
+            return;
+
+        var empresa = await EmpresaServices.GetBy(id);
+
+        await EmpresaServices.Delete(empresa);
+
+        empresas = await EmpresaServices.FindAll();
+
+        StateHasChanged();
+    }
+}

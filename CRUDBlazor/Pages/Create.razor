@@ -1,0 +1,44 @@
+﻿@page "/create/"
+
+@using CRUDBlazor.Models;
+@inject NavigationManager NavigationManager;
+@inject CRUDBlazor.Services.IEmpresaService EmpresaServices;
+
+<h1>Adicionar Empresa</h1>
+
+<EditForm Model="empresa" OnValidSubmit="CreateEmpresa">
+
+    <div class=" form-group mb-3">
+        <label for="EmpresaName">Nome</label>
+        <InputText @bind-Value="empresa.Name" class="form-control" id="EmpresaName"> </InputText>
+    </div>
+
+    <div class=" form-group mb-3">
+        <label for="EmpresaSite">Site</label>
+        <InputText @bind-Value="empresa.Site" class="form-control" id="EmpresaSite"> </InputText>
+    </div>
+
+    <div class=" form-group mb-3">
+        <label for="EmpresaSegmento">Segmento</label>
+        <InputText @bind-Value="empresa.Segmento" class="form-control" id="EmpresaSegmento"> </InputText>
+    </div>
+
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <button class="btn btn-success" type="submit">Salvar</button>
+
+</EditForm>
+
+@code {
+    Empresa empresa = new();
+
+    async Task CreateEmpresa()
+    {
+        empresa.GenerateNewId();
+
+        await EmpresaServices.Add(empresa);
+
+        NavigationManager.NavigateTo("/");
+    }
+}
